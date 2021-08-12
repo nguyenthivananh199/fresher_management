@@ -8,7 +8,34 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 60%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        opacity: 0.7;
+    }
 </style>
+<div id="snackbar">
+    @foreach ($errors->all() as $error)
+    <li>{{ $error }}</li>
+
+    @endforeach
+</div>
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -21,8 +48,8 @@
                         <h5 class="title">Add Admin</h5>
                     </div>
                     <div class="card-body">
-                        <div id="check"></div>
-                        <form action="add_admin" method="POST">
+
+                        <form action="add_admin" method="POST" enctype="multipart/form-data">
                             @csrf
 
                             <div class="row">
@@ -40,7 +67,8 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">Email address</label>
-                                        <input type="email" onclick="mail_check_existed()" class="form-control" name="email" id="email" placeholder="Email">
+                                        <input type="email" onkeyup="mai_check_existed()" class="form-control" name="email" id="email" placeholder="Email">
+                                        <div id="check"></div>
                                     </div>
                                 </div>
                             </div>
@@ -53,6 +81,16 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <label for="exampleInputEmail1">Picture</label>
+                                        <input class="form-control" type="file" name="pic" id="pic" required>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6 pr-1">
                                     <div class="form-group">
@@ -94,7 +132,7 @@
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">Extra permission</label>
                                         <div id="checkboxes">
-                                            <input type="checkbox" id="Fresher_management" name="Fresher_management" value="Fresher management" required>
+                                            <input type="checkbox" id="Fresher_management" name="Fresher_management" value="Fresher management">
                                             <label for="vehicle1">Fresher management</label><br>
 
                                             <input type="checkbox" id="Timesheet_management" name="Timesheet_management" value="Timesheet management">
@@ -108,7 +146,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" name="submit"> Submit</button>
+                            <button type="submit" name="submit" class="submit-btn  btn-info btn" id="submit"> Submit</button>
                         </form>
                     </div>
                 </div>
@@ -129,11 +167,11 @@
 
                     <div class="row">
 
-
-                        <button class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add Admin</button>
+                        <div class="col-10"></div>
+                        <button class="col btn btn-info " data-toggle="modal" data-target="#myModal">Add Admin</button>
                     </div>
-                    <div>
-
+                    <div style="text-align: center;">
+                        <h3>ADMIN MANAGEMENT</h3>
                     </div>
 
                     <div class="input-group no-border">
@@ -141,12 +179,14 @@
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <i class="now-ui-icons ui-1_zoom-bold"></i>
+                                <div class="drop" onclick="myFunctiondrop()" style="float:right;">
+                                    <button class="dropbtn" style="border: none;">Filter</button>
+
+                                </div>
+
                             </div>
                         </div>
-                        <div class="drop" onclick="myFunctiondrop()" style="float:right;">
-                            <button class="dropbtn" style="border: none;">Filter</button>
 
-                        </div>
                     </div>
                     <div class="row" id="demodrop" style="display: none;padding-bottom: 2%;">
 
@@ -172,7 +212,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Part</th>
-                            
+
                                     <th>Function</th>
                                 </tr>
 
@@ -186,10 +226,9 @@
 
     </div>
     <script>
-      
-
         var selected_ = [];
-        function mail_check_existed() {
+
+        function mai_check_existed() {
             var prev_mail = "";
             var txt = document.getElementById("email").value;
             console.log("value :" + txt);
@@ -206,10 +245,13 @@
                     // $('#result').html(data.msg);
                     console.log(data.msg);
 
+
                     if (data.msg == 0) {
-                        document.getElementById("check").innerHTML = "Email available !"
+                        document.getElementById("check").innerHTML = "Email available !";
+                        document.getElementById("submit").disabled = false;
                     } else {
-                        document.getElementById("check").innerHTML = "Email unavailable !"
+                        document.getElementById("check").innerHTML = "Email unavailable !";
+                        document.getElementById("submit").disabled = true;
                     }
                     // $("#data").append(data.msg);
                     // document.getElementById('#result').innerHTML = data;
@@ -217,6 +259,7 @@
                 }
             });
         }
+
         function class_filter() {
             var selected = [];
             $('#checkboxes input:checked').each(function() {
@@ -232,6 +275,7 @@
                 //yes
 
                 searchFresher(id_fresher);
+
             } else {}
         }
 
@@ -240,7 +284,7 @@
         }
 
         function setEmail() {
-            mail_check_existed();
+
             var name = document.getElementById("name").value;
             var lowcase = name.toLowerCase();
             var mail = '';
@@ -260,18 +304,36 @@
             }
             mail = mail + "@vmodev.com";
             mail = removeAccents(mail)
-            document.getElementById("email").value = mail;
+            // document.getElementById("email").value = mail;
         }
 
         function removeAccents(str) {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         }
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#admin_nav').addClass('active');
+        }
         $(document).ready(function() {
+            set_nav();
+            <?php if ($errors->any()) { ?>
+                var x = document.getElementById("snackbar");
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+
+            <?php } ?>
+
+
+
+
             searchFresher();
         });
         //ajax
 
         function searchFresher(delete_id) {
+            var kt = 0;
             //filter_class
             for (var i = 0; i < 3; i++) {
                 if (typeof selected_[i] == 'undefined') {
@@ -287,6 +349,7 @@
                 // the variable is defined
 
             } else {
+                kt = 1;
                 deleteid = delete_id;
             }
             $('#databody').children('#abc').remove();
@@ -306,10 +369,14 @@
                 dataType: "json",
                 success: function(data) {
                     // $('#result').html(data.msg);
-                     console.log(data.msg);
+                    console.log(data.msg);
                     $("#data").append(data.msg);
                     // document.getElementById('#result').innerHTML = data;
                     // $('#result').innerHTML = data
+                    if (kt == 1) {
+
+                    }
+
                 }
             });
         }

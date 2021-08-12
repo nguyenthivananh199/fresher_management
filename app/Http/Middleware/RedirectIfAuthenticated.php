@@ -30,7 +30,7 @@ class RedirectIfAuthenticated
                 if($role[0]=='fresher'){
                     return $next($request);
                 }else{
-                    return redirect()->to('role');
+                    return redirect()->to('dashboard');
                 }
                 
             }

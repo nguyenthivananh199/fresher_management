@@ -1,15 +1,8 @@
 @extends('master')
 @section("content")
 
-<!-- modal box -->
 <style>
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    #snackbar {
+      #snackbar {
         visibility: hidden;
         min-width: 250px;
         margin-left: -125px;
@@ -21,7 +14,7 @@
         position: fixed;
         z-index: 1;
         left: 50%;
-        top: 30px;
+        bottom: 30px;
         font-size: 17px;
     }
 
@@ -37,6 +30,8 @@
     @endforeach
     @endif
 </div>
+
+<!-- change ava -->
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -56,7 +51,7 @@
                                 <div class="col-md-12">
                                     <div>
 
-                                        <div class="row">
+                                    <div class="row">
                                             <div class="col-md-12">
                                                 <div>
                                                     <label for="exampleInputEmail1">Picture</label>
@@ -82,12 +77,69 @@
 
     </div>
 </div>
-<!-- ------------- -->
+<!-- ///////////////// -->
+<div class="modal fade" id="resetPass" role="dialog">
+    <div class="modal-dialog">
 
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div style="text-align: center;margin-top:4%;" class="">
 
+                <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+            <div class="modal-body" id="">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="title">Reset Password</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="reset_pass" method="POST">
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Present password</label>
+                                        <input type="password" name="pre_pass" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">New password</label>
+                                        <input type="password" name="new_pass" id="pass" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Repeat password</label>
+                                        <input type="password" name="repeat" id="re_pass" onkeyup="check_repeat_pass()" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="check"></div>
+
+                            <!-- onkeydown="return /[a-z, ]/i.test(event.key)" onblur="if (this.value == '') {this.value = '';}" onfocus="if (this.value == '') {this.value = '';}" -->
+
+                    </div>
+                    <button type="submit" name="submit" id="submit"> Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
 <div class="panel-header panel-header-sm">
 </div>
-<div class="content">
+<div class="content" >
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -104,19 +156,19 @@
                                 <div class="card-header">
 
 
-                                    <h5 class="title">Fresher Detail</h5>
+                                    <h5 class="title">Profile user</h5>
 
                                 </div>
                                 <div class="card-body">
 
-                                    <form method="POST" action="update">
+                                    <div>
                                         @csrf
-                                        <input type="hidden" name="id" id="" value="{{$user['id']}}">
+                                        <input type="hidden" name="id" id="" value="">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Fullname</label>
-                                                    <input type="text" class="form-control" name="name" id="name" placeholder="name" value="{{$user['name']}}">
+                                                    <label for="" class="form-control">{{$user['name']}}</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -127,8 +179,8 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Email address</label>
-                                                    <input type="email" onkeyup="mai_check_existed()" class="form-control" name="email" id="email" placeholder="Email" value="{{$user['email']}}">
-                                                    <p id="check"></p>
+                                                    <label for="" class="form-control">{{$user['email']}}</label>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -137,7 +189,7 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Date of birth</label>
-                                                    <input type="date" class="form-control" id="dob" name="dob" required>
+                                                    <label for="" class="form-control">{{$user['dob']}}</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -145,24 +197,24 @@
                                             <div class="col-md-4 pr-1">
                                                 <div class="form-group">
                                                     <label>Part</label>
-                                                    <input type="text" class="form-control" placeholder="Part" name="part" value="{{$user['part']}}" required>
+                                                    <label for="" class="form-control">{{$user['part']}}</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 px-1">
                                                 <div class="form-group">
                                                     <label>Class</label>
-                                                    <input type="text" class="form-control" placeholder="Class" name="class" value="{{$user['class']}}" required>
+                                                    <label for="" class="form-control">{{$user['class']}}</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 pl-1">
                                                 <div class="form-group">
                                                     <label>Phone</label>
-                                                    <input type="number" class="form-control" placeholder="Phone" name="phone" value="{{$user['phone']}}" required>
+                                                    <label for="" class="form-control">{{$user['phone']}}</label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="submit" name="submit" value="submit" id="submit"> submit</button>
-                                    </form>
+                                        <a href="" style="float: right;" data-toggle="modal" data-target="#resetPass"> Reset password</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -172,7 +224,7 @@
 
                                 </div>
                                 <div class="card-body">
-                                    <div class="author">
+                                <div class="author">
                                         <a href="#">
                                             <img class="avatar border-gray" data-toggle="modal" data-target="#myModal" src="{{$user['img']}}" alt="...">
                                             <p>Change avatar</p>
@@ -182,7 +234,7 @@
 
                                 </div>
                                 <hr>
-
+                                
                             </div>
                         </div>
                     </div>
@@ -190,58 +242,33 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-            set_nav();
-
-            var tmp = "<?php echo  $user->dob; ?>";
-            document.getElementById("dob").value = tmp;
-
-
-            <?php if ($errors->any()) { ?>
-                var x = document.getElementById("snackbar");
-                x.className = "show";
-                setTimeout(function() {
-                    x.className = x.className.replace("show", "");
-                }, 3000);
-
-            <?php } ?>
-        });
-
-        function set_nav() {
+</div>
+<script>
+    function check_repeat_pass() {
+        var p = document.getElementById('pass').value;
+        var p1 = document.getElementById('re_pass').value;
+        if (p1 != p) {
+            document.getElementById("check").innerHTML = "Unmatch password !";
+            document.getElementById("submit").disabled = true;
+        } else {
+            document.getElementById("check").innerHTML = "Matched password !";
+            document.getElementById("submit").disabled = false;
+        }
+    }
+    function set_nav() {
             $(".nav1 li").removeClass("active");
-            $('#fresher_nav').addClass('active');
+            $('#profile_nav').addClass('active');
         }
+    $(document).ready(function() {
+        set_nav();
+        <?php if ($errors->any()) { ?>
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            setTimeout(function() {
+                x.className = x.className.replace("show", "");
+            }, 3000);
 
-        function mai_check_existed() {
-            var prev_mail = "<?php echo  $user->email; ?>";
-            var txt = document.getElementById("email").value;
-            console.log("value :" + txt);
-            $.ajax({
-                url: "/email_ajax",
-                // method: "GET",
-                type: "GET",
-                data: {
-                    search: txt,
-                    prev_mail: prev_mail,
-                },
-                dataType: "json",
-                success: function(data) {
-                    // $('#result').html(data.msg);
-                    console.log(data.msg);
-
-                    if (data.msg == 0) {
-                        document.getElementById("check").innerHTML = "Email available !";
-                        document.getElementById("submit").disabled = false;
-                    } else {
-                        document.getElementById("check").innerHTML = "Email unavailable !";
-                        document.getElementById("submit").disabled = true;
-                    }
-                    // $("#data").append(data.msg);
-                    // document.getElementById('#result').innerHTML = data;
-                    // $('#result').innerHTML = data
-                }
-            });
-        }
-    </script>
-    @endsection
+        <?php } ?>
+    });
+</script>
+@endsection

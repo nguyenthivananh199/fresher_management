@@ -8,10 +8,36 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 60%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        opacity: 0.7;
+    }
 </style>
 
 <!-- ------------- -->
+<div id="snackbar">
+@foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
 
+                        @endforeach
+</div>
 
 <div class="panel-header panel-header-sm">
 </div>
@@ -27,7 +53,7 @@
 
                     <!-- onkeydown="return /[a-z, ]/i.test(event.key)" onblur="if (this.value == '') {this.value = '';}" onfocus="if (this.value == '') {this.value = '';}" -->
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
 
@@ -44,7 +70,7 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="exampleInputEmail1">Fullname</label>
-                                                    <input type="text" class="form-control" onkeyup="check_exist_role();" name="name" id="name" placeholder="name" value="{{$role['name']}}">
+                                                    <input type="text" class="form-control" onkeyup="check_exist_role();" name="name" id="name" placeholder="name" value="{{$role['name']}}" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -54,19 +80,19 @@
                                                     <label for="exampleInputEmail1">Permission</label>
                                                     <div id="checkboxes">
 
-                                                        <input type="checkbox" id="Fresher_management" name="Fresher_management" value="Fresher management" required>
+                                                        <input type="checkbox" id="Fresher_management" name="Fresher_management" value="Fresher management" class="acb" onclick='deRequireCb("acb")' required >
                                                         <label for="vehicle1">Fresher management</label><br>
 
-                                                        <input type="checkbox" id="Timesheet_management" name="Timesheet_management" value="Timesheet management">
+                                                        <input type="checkbox" id="Timesheet_management" name="Timesheet_management" value="Timesheet management" class="acb" onclick='deRequireCb("acb")' required>
                                                         <label for="vehicle1">Timesheet management</label><br>
 
-                                                        <input type="checkbox" id="Report_management" name="Report_management" value="Report management">
+                                                        <input type="checkbox" id="Report_management" name="Report_management" value="Report management" class="acb" onclick='deRequireCb("acb")' required>
                                                         <label for="vehicle1">Report management</label><br>
 
 
                                                     </div>
 
-                                                    <button type="submit" name="submit" id="submit" value="submit"> submit</button>
+                                                    <button type="submit" name="submit" id="submit" class="submit-btn  btn-info btn" value="submit"> submit</button>
                                     </form>
                                 </div>
                             </div>
@@ -78,14 +104,51 @@
         </div>
     </div>
     <script>
+       function deRequireCb(elClass) {
+           
+           //  document.getElementsByClassName("acb").required = false;
+             el=document.getElementsByClassName(elClass);
+             
+             var atLeastOneChecked=false;//at least one cb is checked
+             for (i=0; i<el.length; i++) {
+                 if (el[i].checked === true) {
+                     atLeastOneChecked=true;
+                 }
+             }
+ 
+             if (atLeastOneChecked === true) {
+                 for (i=0; i<el.length; i++) {
+                     $(".acb").removeAttr("required");
+                 }
+             } else {
+                 for (i=0; i<el.length; i++) {
+                     $(".acb").attr("required","");
+                 }
+             }
+            // alert(atLeastOneChecked);
+         }
+         function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#role_nav').addClass('active');
+        }
         $(document).ready(function() {
+            set_nav();
             const permision_list = [];
+          
+            <?php if ($errors->any()) { ?>
+                var x = document.getElementById("snackbar");
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+
+            <?php } ?>
             <?php for ($i = 0; $i < count($permission); $i++) { ?>
                 var tmp = '<?php echo $permission[$i]['name']; ?>';
                 tmp = tmp.replace(/ /g, "_");
                 document.getElementById(tmp).checked = true;
             <?php } ?>
-
+            deRequireCb('acb');
         });
 
         function check_exist_role() {

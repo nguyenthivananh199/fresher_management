@@ -28,6 +28,14 @@ class RequestController extends Controller
     {
         $user = Auth::user();
 
+
+
+        //check holiday permission
+        
+        $dayofweek = date('l', strtotime($request->date));
+                    if ($dayofweek == "Sunday" || $dayofweek == 'Saturday') {
+                        return redirect() ->back()->withErrors(['Fail,unavalable absence day']);
+                    }
         //check absence date
 
         $last_req = Absence_request::where('user_id', $user->id)
@@ -36,57 +44,58 @@ class RequestController extends Controller
         if (count($last_req) == 0) {
             // no req existed
             $this->save_request($request, $user->id);
-            return 'oki';
+           // return view('fresher.request', ['mess' => 'Add request successfully']);
+           return redirect() ->back()->withErrors([ 'Add request successfully']);
         } else {
             if (count($last_req) == 1) {
 
                 if ($last_req[0]['status'] == 'Reject') {
                     $this->save_request($request,$user->id);
-                            return 'oki re';
+                    return redirect() ->back()->withErrors([ 'Add request successfully']);
                 } else {
                     if ($last_req[0]['type'] == 'Full') {
-                        return 'do none';
+                        return redirect() ->back()->withErrors(['Fail,you ve already had day off request ']);
                     }
                     if ($last_req[0]['type'] == 'Morning') {
                         //accept: Afternoon, Leave early
                         if ($request->type == 'Afternoon' || $request->type == 'Leave early') {
                             $this->save_request($request,$user->id);
-                            return 'oki';
+                            return redirect() ->back()->withErrors([ 'Add request successfully']);
                         } else {
-                            return 'wrong type';
+                            return redirect() ->back()->withErrors([ 'Fail,request type conflic']);
                         }
                     }
                     if ($last_req[0]['type'] == 'Afternoon') {
                         //accept: Morning late, Morning
                         if ($request->type == 'Morning' || $request->type == 'Morning late') {
                             $this->save_request($request,$user->id);
-                            return 'oki';
+                            return redirect() ->back()->withErrors([ 'Add request successfully']);
                         } else {
-                            return 'wrong type';
+                            return redirect() ->back()->withErrors([ 'Fail,request type conflic']);
                         }
                     }
                     if ($last_req[0]['type'] == 'Leave early') {
                         //accept: Morning late, Morning
                         if ($request->type == 'Morning' || $request->type == 'Morning late') {
                             $this->save_request($request,$user->id);
-                            return 'oki';
+                            return redirect() ->back()->withErrors([ 'Add request successfully']);
                         } else {
-                            return 'wrong type';
+                            return redirect() ->back()->withErrors([ 'Fail,request type conflic']);
                         }
                     }
                     if ($last_req[0]['type'] == 'Morning late') {
                         //accept: Afternoon, Leave early
                         if ($request->type == 'Afternoon' || $request->type == 'Leave early') {
                             $this->save_request($request,$user->id);
-                            return 'oki';
+                            return redirect() ->back()->withErrors(['Add request successfully']);
                         } else {
-                            return 'wrong type';
+                            return redirect() ->back()->withErrors([ 'Fail,request type conflic']);
                         }
                     }
                 }
             }else{
                 //no more
-                return 'no more';
+                return redirect() ->back()->withErrors(['Fail,you ve already had 2 requests']);
             }
         }
     }
@@ -117,7 +126,7 @@ class RequestController extends Controller
             } else {
                 $data1 = Absence_request::where('user_id', $user->id)
                     ->whereMonth('absence_date', '=', $m)
-                    ->where('type', $req_type)
+                    ->where('status', $req_type)
                     ->orderBy('created_at', $req_order)
                     ->get();
             }
@@ -178,33 +187,48 @@ class RequestController extends Controller
             }
 
             if ($req_type == '') {
-                $data1 = User::where('name', 'like', '%' . $search . '%')
+                if($req_order==''){
+                    $data1 = User::where('name', 'like', '%' . $search . '%')
 
                     ->join('requests', function ($join) use ($m, $req_order) {
                         $join->on('users.id', '=', 'requests.user_id');
                         $join->whereMonth('requests.absence_date', '=', $m);
-                        $join->orderBy('created_at', $req_order);
                     })
                     ->get();
+                }else{
+                    $data1 = User::where('name', 'like', '%' . $search . '%')
 
-                // $data1 =Absence_request::whereMonth('absence_date', '=',$m )
-                // ->orderBy('created_at', $req_order)
-                //     ->get();
-
-                // return response()->json(
-                //     array('msg' => $data1),
-                //     200
-                // );
+                    ->join('requests', function ($join) use ($m, $req_order, $req_type) {
+                        $join->on('users.id', '=', 'requests.user_id');
+                        $join->whereMonth('requests.absence_date', '=', $m);
+                        $join->where('requests.status', '=', $req_order);
+                       
+                    })
+                    ->get();
+                }
             } else {
-                $data1 = User::where('name', 'like', '%' . $search . '%')
+                if($req_order==''){
+                    $data1 = User::where('name', 'like', '%' . $search . '%')
 
                     ->join('requests', function ($join) use ($m, $req_order, $req_type) {
                         $join->on('users.id', '=', 'requests.user_id');
                         $join->whereMonth('requests.absence_date', '=', $m);
                         $join->where('requests.type', '=', $req_type);
-                        $join->orderBy('created_at', $req_order);
                     })
                     ->get();
+                }else{
+                    $data1 = User::where('name', 'like', '%' . $search . '%')
+
+                    ->join('requests', function ($join) use ($m, $req_order, $req_type) {
+                        $join->on('users.id', '=', 'requests.user_id');
+                        $join->whereMonth('requests.absence_date', '=', $m);
+                        $join->where('requests.type', '=', $req_type);
+                        $join->where('requests.status', '=', $req_order);
+                        
+                    })
+                    ->get();
+                }
+                
             }
 
             //}

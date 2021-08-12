@@ -20,37 +20,56 @@ class ReportController extends Controller
     }
     function getData(Request $request)
     {
-        $in_time = date('08:35:00');
+        $in_time = date('17:45:00');
 
         $output = '';
         if ($request->has('m')) {
             $m = $request->m;
             $d = $request->d;
+            $max_day = $d + 1;
+            // return response()->json(
+            //     array('msg' => date("m")),
+            //     200
+            // );
+            if ($m > date("m")) {
+                return response()->json(
+                    array('msg' => ''),
+                    200
+                );
+            }
+            if ($m == date("m")) {
+                $max_day = date("d") + 1;
+            }
+
             //   $data="<td>rgyyege</td><td>rgyyege</td><td>rgyyege</td>";
 
             //    return response()->json($search);
             if (isset($request->search)) {
                 $search = $request->search;
-                $data1 = User::where('name', 'like', '%' . $search . '%')
+                $users = User::where('name', 'like', '%' . $search . '%')
+                    ->whereHas(
+                        'roles',
+                        function ($q) {
+                            $q->where('name', 'fresher');
+                        }
+                    )
 
-                    ->join('reports', function ($join) use ($m) {
-                        $join->on('users.id', '=', 'reports.user_id');
-                        $join->whereMonth('reports.created_at', '=', $m);
-                    })
+                    ->where('status', 'Active')
                     ->get();
+            } else {
+                $users = User::whereHas(
+                    'roles',
+                    function ($q) {
+                        $q->where('name', 'fresher');
+                    }
+                )
 
-                // $op='<p>'.$data1[0]['id'].'</p>';
+                    ->where('status', 'Active')
+                    ->get();
                 // return response()->json(
-                //     array('msg' => $op),
+                //     array('msg' => $data1),
                 //     200
                 // );
-            } else {
-                $data1 = User::join('reports', function ($join) use ($m) {
-                    $join->on('users.id', '=', 'reports.user_id');
-                    $join->whereMonth('reports.created_at', '=', $m);
-                })
-                    ->get();
-             
             }
 
 
@@ -58,60 +77,102 @@ class ReportController extends Controller
 
 
 
-            $user_list = array();
-            $user_id = array();
+            // $user_list = array();
+            // $user_id = array();
+            // $tests = array();
 
 
-            $user_list[] = $data1[0]['user_id'];
-            $user_id[] = $data1[0]['name'];
-            // get distint user in a month
-            for ($i = 0; $i < count($data1); $i++) {
-                $kt = 1;
-                for ($j = 0; $j < count($user_list); $j++) {
-                    if ($data1[$i]['user_id'] == $user_list[$j]) {
-                        $kt = 0;
-                        break;
-                    }
-                }
-                if ($kt == 1) {
-                    $user_list[] = $data1[$i]['user_id'];
-                    $user_id[] = $data1[$i]['name'];
-                }
-            }
+            // $user_list[] = $data1[0]['user_id'];
+            // $user_id[] = $data1[0]['name'];
+
+            // // get distint user in a month
+            // for ($i = 0; $i < count($data1); $i++) {
+            //     $kt = 1;
+            //     for ($j = 0; $j < count($user_list); $j++) {
+            //         if ($data1[$i]['user_id'] == $user_list[$j]) {
+            //             $kt = 0;
+            //             break;
+            //         }
+            //     }
+            //     if ($kt == 1) {
+            //         $user_list[] = $data1[$i]['user_id'];
+            //         $user_id[] = $data1[$i]['name'];
+            //     }
+            // }
 
 
             //main thing
-            for ($i = 0; $i < count($user_list); $i++) {
+            for ($i = 0; $i < count($users); $i++) {
                 $count_work = 0;
-                $detail_id = array_fill(0, $d + 1, -1);
-                $row = array_fill(0, $d + 2, 0);
-                $row[1] = $user_id[$i];
-                $row[0] = $user_list[$i];
-                for ($j = 0; $j < count($data1); $j++) {
-                    if ($data1[$j]['user_id'] == $user_list[$i]) {
-                        // get day
+                $detail_id = array_fill(0, $d + 2, -1);
+                $row = array_fill(0, $d + 2, "N/A");
+                $row[1] = $users[$i]['name'];
+                $row[0] = $users[$i]['id'];
 
 
-                        $day = substr($data1[$j]['created_at'],  8, 2);
-                        $day = $day + 1;
 
-                        $detail_id[$day] = $data1[$j]['id'];
-                        $hour = date_create_from_format("Y-m-d H:i:s", $data1[$j]['created_at'])->format("H:i:s");
-                        if ($in_time < $hour) {
-                            $row[$day]  = '-';
+                for ($j = 2; $j < count($row); $j++) {
+                    //get day
+                    $t1 = $j - 1;
+                    $tmp = date("Y") . '-' . $m . '-' . $t1;
+                    $date = date($tmp);
+                    $dayofweek = date('l', strtotime($date));
+                    if ($dayofweek == "Sunday" || $dayofweek == 'Saturday') {
+                        $row[$j] = '_';
+                    } else {
+                        $data1 = Report::whereDate('created_at', '=', $date)
+                            ->where('user_id', $row[0])->first();
+                        if (isset($data1)) {
+
+                            $detail_id[$j] = $data1['id'];
+                            $hour = date_create_from_format("Y-m-d H:i:s", $data1['created_at'])->format("H:i:s");
+
+                            if ($in_time < $hour) {
+                                $row[$j]  = 'O/T';
+                            } else {
+                                $count_work++;
+                                $row[$j] = 'I/T';
+                            }
                         } else {
-                            $count_work++;
-                            $row[$day] = '+';
+                            // return response()->json(
+                            //     array('msg' => 'yeah'),
+                            //     200
+                            // );
                         }
+                        // return response()->json(
+                        //     array('msg' => $row),
+                        //     200
+                        // );
+
+
+
                     }
                 }
+                // return response()->json(
+                //             array('msg' => $row),
+                //             200
+                //         );
                 $output .= '<tr id="abc">';
                 for ($t = 0; $t < count($row); $t++) {
-                    if (isset($detail_id[$t])) {
-
-                        $output .= '<td  onclick="detail(' . $detail_id[$t] . ');"  data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                    if ($t <= $max_day) {
+                        if (isset($detail_id[$t])) {
+                            if ($row[$t] == "N/A") {
+                                $output .= '<td  onclick="detail(' . $detail_id[$t] . ');" class="report_missing" data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                            } else {
+                                if ($row[$t] == "O/T") {
+                                    $output .= '<td  onclick="detail(' . $detail_id[$t] . ');" class="report_out_time" data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                                } else {
+                                    if ($row[$t] == "I/T") {
+                                        $output .= '<td  onclick="detail(' . $detail_id[$t] . ');" class="report_in_time" data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                                    } else {
+                                        $output .= '<td  onclick="detail(' . $detail_id[$t] . ');"  data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                                    }
+                                }
+                            }
+                        } else {
+                        }
                     } else {
-                        $output .= '<td onclick="detail(-1);"  data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
+                        $output .= '<td  "> </td>';
                     }
                 }
                 $output .= '<td>' . $count_work . '</td>';
@@ -119,20 +180,87 @@ class ReportController extends Controller
             }
 
 
-            // return response()->json(
-            //     array('msg' => $output),
-            //     200
-            // );
-
-
+            return response()->json(
+                array('msg' => $output),
+                200
+            );
         } else {
             if ($request->has('id')) {
                 $id = $request->id;
                 $data1 = Report::where('id', '=', $id)
                     ->first();
                 $output .= '
-                <h5>Name :' . $data1->user->name . '</h5>
-                <h5>Time in :' . $data1['created_at'] . '</h5>';
+                <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Fresher name</label>
+                                    <p class="form-control">' . $data1->user->name .  '</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Submitted time</label>
+                                <p class="form-control">' . $data1['created_at'] .  '</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Today plan</label>
+                            <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->today_plan . '</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Actual</label>
+                        <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->actual . '</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Tomorrow plan</label>
+                    <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->tomorrow_plan . '</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Issues</label>
+                <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->issues . '</textarea>
+            </div>
+
+        </div>
+      
+  </div>
+  <div class="row">
+  <div class="col-md-12">
+      <div class="form-group">
+          <label for="exampleInputEmail1">Action</label>
+          <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->action . '</textarea>
+      </div>
+
+  </div>
+
+</div>
+<div class="row">
+<div class="col-md-12">
+    <div class="form-group">
+        <label for="exampleInputEmail1">Note</label>
+        <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->note . '</textarea>
+    </div>
+
+</div>
+
+</div>
+               ';
             }
         }
 
@@ -183,23 +311,89 @@ class ReportController extends Controller
             );
         } else {
             if ($request->has('detail_day')) {
-                $output='';
+                $output = '';
                 $day = $request->detail_day;
-                $month=$request->month;
-                $data1 = Report::whereMonth('created_at', '=',$month )
-                ->whereDay('created_at', '=',$day)
-                ->where('user_id',$user->id)
-                ->first();
+                $month = $request->month;
+                $data1 = Report::whereMonth('created_at', '=', $month)
+                    ->whereDay('created_at', '=', $day)
+                    ->where('user_id', $user->id)
+                    ->first();
 
-                   
+
                 $output .= '
-                <h5>Name :' . $user->name . '</h5>
-                <h5>Today plan :' . $data1->today_plan . '</h5>
-                <h5>Actual :' . $data1->actual . '</h5>
-                <h5>Issues :' . $data1->issues . '</h5>
-                <h5>Action :' . $data1->action . '</h5>
-                <h5>Note :' . $data1->note . '</h5>';
-               
+
+                <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Fresher name</label>
+                                    <p class="form-control">' . $user->name .  '</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Submitted time</label>
+                                <p class="form-control">' . $data1['created_at'] .  '</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Today plan</label>
+                            <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->today_plan . '</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Actual</label>
+                        <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->actual . '</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Tomorrow plan</label>
+                    <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->tomorrow_plan . '</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Issues</label>
+                <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->issues . '</textarea>
+            </div>
+
+        </div>
+      
+  </div>
+  <div class="row">
+  <div class="col-md-12">
+      <div class="form-group">
+          <label for="exampleInputEmail1">Action</label>
+          <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->action . '</textarea>
+      </div>
+
+  </div>
+
+</div>
+<div class="row">
+<div class="col-md-12">
+    <div class="form-group">
+        <label for="exampleInputEmail1">Note</label>
+        <textarea rows="2" class="form-control" name="note" style="width: 100%;">' . $data1->note . '</textarea>
+    </div>
+
+</div>
+
+</div>
+                ';
+
                 return response()->json(
                     array('msg' => $output),
                     200
@@ -207,52 +401,52 @@ class ReportController extends Controller
             }
         }
     }
-    function add_report(Request $request){
+    function add_report(Request $request)
+    {   date_default_timezone_set('Asia/Ho_Chi_Minh');
         $user = Auth::user();
-        $report= new Report();
-        $report->user_id=$user->id;
-        $report->today_plan=strip_tags($request->today_plan);
-        $report->actual=strip_tags($request->actual);
-        $report->tomorrow_plan=strip_tags($request->tomorrow_plan) ;
-        $report->issues=strip_tags($request->issues) ;
-        $report->action=strip_tags($request->action) ;
-        $report->note=strip_tags($request->note) ;
+        $report = new Report();
+        $report->user_id = $user->id;
+        $report->today_plan = strip_tags($request->today_plan);
+        $report->actual = strip_tags($request->actual);
+        $report->tomorrow_plan = strip_tags($request->tomorrow_plan);
+        $report->issues = strip_tags($request->issues);
+        $report->action = strip_tags($request->action);
+        $report->note = strip_tags($request->note);
 
         $report->save();
         return redirect()->route('report');
     }
-    function edit_report(Request $request){
+    function edit_report(Request $request)
+    {
         $user = Auth::user();
-        $report=Report::find($request->id);
-        $report->user_id=$user->id;
-        $report->today_plan=$request->today_plan;
-        $report->actual=$request->actual;
-        $report->tomorrow_plan=$request->tomorrow_plan;
-        $report->issues=$request->issues;
-        $report->action=$request->action;
-        $report->note=$request->note;
+        $report = Report::find($request->id);
+        $report->user_id = $user->id;
+        $report->today_plan = $request->today_plan;
+        $report->actual = $request->actual;
+        $report->tomorrow_plan = $request->tomorrow_plan;
+        $report->issues = $request->issues;
+        $report->action = $request->action;
+        $report->note = $request->note;
 
         $report->save();
         return redirect()->route('report');
-
     }
-    function check_today_report(){
-        
+    function check_today_report()
+    {
+
         if (Session::has('check_report')) {
             Session::forget('check_report');
-            
         }
-        $today= date("Y-m-d");
-        $today_report= Report::whereDate('created_at','=',$today)->first();
-       
-        if(!empty($today_report)){
-          
-            return view('fresher.report',['daily_report'=>$today_report])->with('check_report', 'true');
-        }else{
+        $today = date("Y-m-d");
+        $today_report = Report::whereDate('created_at', '=', $today)->first();
+
+        if (!empty($today_report)) {
+
+            return view('fresher.report', ['daily_report' => $today_report])->with('check_report', 'true');
+        } else {
             //add avalable
-            $today_report=new Report();
-            return view('fresher.report',['daily_report'=>$today_report])->with('check_report', 'false');
+            $today_report = new Report();
+            return view('fresher.report', ['daily_report' => $today_report])->with('check_report', 'false');
         }
-        
     }
 }

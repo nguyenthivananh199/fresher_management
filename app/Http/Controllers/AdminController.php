@@ -4,22 +4,28 @@ namespace App\Http\Controllers;
 use App\Models\Absence_request;
 use App\Models\User;
 use App\Models\Report;
+use App\Http\Requests\AddFresherRequest;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 class AdminController extends Controller
 {
     //
+    function view_profile(){
+        $user = Auth::user();
+        return view('admin.profile', ['user' => $user]);
+    }
     function data_prepare(){
         $roles=Role::where('name','!=','Super_Admin')
         ->where('name','!=','fresher')->get();
         return view('super_admin.admin_management',['roles'=>$roles]);
     }
 
-    function update_admin(Request $request){
+    function update_admin(AddFresherRequest $request){
         
         
         $dob = $request->dob;
@@ -47,23 +53,56 @@ class AdminController extends Controller
         if(isset($request->Report_management)){
             $user->givePermissionTo($request->Report_management);
         }
-        return redirect()->back()->with('mess', 'oki');
+        return redirect()->back()->withErrors(['Update successfully']);
     }
-    function add_admin(Request $request){
-     
+
+
+    //update ava
+    function update_ava(Request $request)
+    {
+        if (!$request->hasFile('pic')) {
+            // Nếu không thì in ra thông báo
+            return "Mời chọn file cần upload";
+        }
+
+        // Nếu có thì thục hiện lưu trữ file vào public/images
+        $image = $request->file('pic');
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $pic_name = $request->id . date("YmdHis") . '.jpg';
+        $storedInPath = $image->move('img', $pic_name);
+
+        //update in db
+        $user = User::find($request->id);
+        $user->img = '/img/' . $pic_name;
+        $user->save();
+        //delete old one direct in public
+        $image_path = '/home/vananh/final/public' . $request->pre_img;  // Value is not URL but directory file path
+        if (File::exists($image_path)) {
+            File::delete($image_path);
+        }
+
+        return redirect()->route('admin_detail', ['id' => $request->id])->withErrors(['Update successfully']);
+    }
+    function add_admin(AddFresherRequest $request){
+        $image = $request->file('pic');
+
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $pic_name = date("YmdHis") . '.jpg';
+        $storedInPath = $image->move('img', $pic_name);
 
 
         $dob = $request->dob;
         $dob = $this->Formed_date_input($dob);
         $status = 'Active';
         // form dob
-        // $part=$request->part;
+        // $part=$request->part
         // $class=$request->class;
         $pass = Hash::make($dob);
         // $phone=$request->phone;
 
         //add to db
         $user = new User();
+        $user->img = '/img/' . $pic_name;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->part = $request->part;
@@ -74,7 +113,7 @@ class AdminController extends Controller
         $user->save();
 
         $user->assignRole($request->role);
-        $user->assignRole('admin_default');
+        
         if(isset($request->Fresher_management)){
             $user->givePermissionTo($request->Fresher_management);
         }
@@ -86,7 +125,7 @@ class AdminController extends Controller
         }
         // return redirect()->back()->with('add_success','ok');
         // Session::put('mess', 'ok');
-        return redirect()->back()->with('mess', 'oki');
+        return redirect()->back()->withErrors(['Successfully']);
 
     }
     function Formed_date_input($date)

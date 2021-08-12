@@ -2,7 +2,7 @@
 @section("content")
 <div class="panel-header" style="padding-bottom: 5%;">
 
-   <h3 style="color: white;padding:3%"><strong> Welcome to VMOmanage</strong></h3>
+   <h3 style="color: white;padding:3%"><strong> Welcome to <span style="color: #f86f06;">V</span>MOmanage</strong></h3>
 </div>
 
 <div class="content">
@@ -13,7 +13,7 @@
 
 
         <div class="col-lg">
-            <div class="card card-chart">
+            <div class="card ms card-chart">
                 <div class="card-header">
 
                 </div>
@@ -37,7 +37,7 @@
         @can('Fresher management')
         <!-- new fresher this month -->
         <div class="col-lg">
-            <div class="card card-chart">
+            <div class="card card-chart ms">
                 <div class="card-header">
 
                 </div>
@@ -61,7 +61,7 @@
         @can('Report management')
         <!-- new fresher this month -->
         <div class="col-lg">
-            <div class="card card-chart">
+            <div class="card card-chart ms">
                 <div class="card-header">
 
                 </div>
@@ -85,7 +85,7 @@
         @can('Timesheet management')
         <!-- new fresher this month -->
         <div class="col-lg">
-            <div class="card card-chart">
+            <div class="card card-chart ms">
                 <div class="card-header">
 
                 </div>
@@ -134,6 +134,15 @@
     </div>
 </div>
 <script>
+$(document).ready(function () {
+  $(".nav1 li").removeClass("active");//this will remove the active class from  
+                                     //previously active menu item 
+  $('#dashboard_nav').addClass('active');
+  //for demo
+  //$('#demo').addClass('active');
+  //for sale 
+  //$('#sale').addClass('active');
+});
     var x = 7;
     Highcharts.chart('container', {
 

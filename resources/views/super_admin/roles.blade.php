@@ -7,7 +7,34 @@
         -webkit-appearance: none;
         margin: 0;
     }
+
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 60%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        opacity: 0.7;
+    }
 </style>
+<div id="snackbar">
+@foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+
+                        @endforeach
+</div>
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -38,9 +65,9 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                     <label for="exampleInputEmail1">Permission</label>
-                                    <div id="checkboxes">
+                                    <div id="checkboxes ">
                                 @foreach ($permission as $part)
-                                <input type="checkbox"  id="class" name="{{$part->name}}" value="{{$part->name}}">
+                                <input type="checkbox"  id="class" name="{{$part->name}}" value="{{$part->name}}" class="acb" onclick='deRequireCb("acb")' required>
                                 <label for="vehicle1">{{$part->name}} </label><br>
                                 
 
@@ -52,7 +79,7 @@
 
                             
                             
-                            <button type="submit" name="submit" id="submit"> Submit</button>
+                            <button type="submit" name="submit" id="submit" class="submit-btn  btn-info btn"> Submit</button>
                         </form>
                     </div>
                 </div>
@@ -72,9 +99,12 @@
                 <div class="card-header">
 
                     <div class="row">
+                    <div class="col-10"></div>
 
-
-                        <button class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add Role</button>
+                        <button class="col btn btn-info " data-toggle="modal" data-target="#myModal">Add Role</button>
+                    </div>
+                    <div style="text-align: center;">
+                    <h3>ROLE MANAGEMENT</h3>
                     </div>
                     <div>
 
@@ -87,24 +117,9 @@
                                 <i class="now-ui-icons ui-1_zoom-bold"></i>
                             </div>
                         </div>
-                        <div class="drop" onclick="myFunctiondrop()" style="float:right;">
-                            <button class="dropbtn" style="border: none;">Filter</button>
-
-                        </div>
+                       
                     </div>
-                    <div class="row" id="demodrop" style="display: none;padding-bottom: 2%;">
-
-                        <div class="col-6">
-
-                            <legend>Choose class :</legend>
-                            <?php $count = 1; ?>
-
-
-                        </div>
-
-                        <!-- <input type="submit" value="Submit now" /> -->
-                        <!-- </fieldset> -->
-                    </div>
+                    
                     <!-- <input type="text" id="search" onkeyup="preClick(3);" placeholder="Search.."> -->
 
                 </div>
@@ -130,6 +145,37 @@
 
     </div>
     <script>
+        function deRequireCb(elClass) {
+           
+          //  document.getElementsByClassName("acb").required = false;
+            el=document.getElementsByClassName(elClass);
+            
+            var atLeastOneChecked=false;//at least one cb is checked
+            for (i=0; i<el.length; i++) {
+                if (el[i].checked === true) {
+                    atLeastOneChecked=true;
+                }
+            }
+
+            if (atLeastOneChecked === true) {
+                for (i=0; i<el.length; i++) {
+                    $(".acb").removeAttr("required");
+                }
+            } else {
+                for (i=0; i<el.length; i++) {
+                    $(".acb").attr("required","");
+                }
+            }
+        }
+        function check_required_permission(){
+            if($('div..required :checkbox:checked').length > 0){
+                   document.getElementById('submit').disabled=false;
+                   alert('ok');
+            }else{
+                document.getElementById('submit').disabled=true;
+                alert("no");
+            }
+        }
         function check_exist_role(){
             var name=document.getElementById('name').value;
             $('#check').html('');
@@ -176,7 +222,20 @@
                 searchFresher(id_fresher);
             } else {}
         }
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#role_nav').addClass('active');
+        }
         $(document).ready(function() {
+            set_nav();
+            <?php if ($errors->any()) { ?>
+                var x = document.getElementById("snackbar");
+                x.className = "show";
+                setTimeout(function() {
+                    x.className = x.className.replace("show", "");
+                }, 3000);
+
+            <?php } ?>
             searchFresher();
         });
        

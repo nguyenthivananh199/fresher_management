@@ -43,11 +43,11 @@ class DemoController extends Controller
             File::delete($image_path);
         }
 
-        return redirect()->route('fresher_detail', ['id' => $request->id]);
+        return redirect()->route('fresher_detail', ['id' => $request->id])->withErrors(['Update avatar successfully']);
     }
 
     //update fresher
-    function update_fresher(Request $request)
+    function update_fresher(AddFresherRequest $request)
     {
         $user = User::find($request->id);
         $user->name = $request->name;
@@ -58,7 +58,7 @@ class DemoController extends Controller
         $user->phone = $request->phone;
         $user->save();
 
-        return redirect()->route('fresher_detail', ['id' => $request->id])->with('mess', 'oki');;
+        return redirect()->route('fresher_detail', ['id' => $request->id])->withErrors(['Update fresher successfully']);
     }
     //check mail
     function mail_ajax(Request $request)
@@ -170,6 +170,15 @@ class DemoController extends Controller
     }
     public function add_fresher(AddFresherRequest $request)
     {
+
+        $image = $request->file('pic');
+
+        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        $pic_name = date("YmdHis") . '.jpg';
+        $storedInPath = $image->move('img', $pic_name);
+
+
+
         // Will return only validated data
         // $name=$request->name;
         // $emai=$request->email;
@@ -184,6 +193,7 @@ class DemoController extends Controller
 
         //add to db
         $user = new User();
+        $user->img = '/img/' . $pic_name;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->part = $request->part;
@@ -260,6 +270,13 @@ class DemoController extends Controller
             $m = $request->m;
 
             $d = $request->d;
+
+            if ($m > date("m")) {
+                return response()->json(
+                    array('msg' => ''),
+                    200
+                );
+            }
             //   $data="<td>rgyyege</td><td>rgyyege</td><td>rgyyege</td>";
 
             //    return response()->json($search);
@@ -267,15 +284,15 @@ class DemoController extends Controller
                 $search = $request->search;
                 $data1 = User::where('name', 'like', '%' . $search . '%')
 
-                ->whereHas(
-                    'roles',
-                    function ($q) {
-                        $q->where('name', 'fresher');
-                    }
-                )
-               
-                ->where('status', 'Active')
-                ->get();
+                    ->whereHas(
+                        'roles',
+                        function ($q) {
+                            $q->where('name', 'fresher');
+                        }
+                    )
+
+                    ->where('status', 'Active')
+                    ->get();
                 // $op='<p>'.$data1[0]['id'].'</p>';
                 // return response()->json(
                 //     array('msg' => $data1),
@@ -293,9 +310,9 @@ class DemoController extends Controller
                         $q->where('name', 'fresher');
                     }
                 )
-               
-                ->where('status', 'Active')
-                ->get();
+
+                    ->where('status', 'Active')
+                    ->get();
                 // return response()->json(
                 //     array('msg' => $data1),
                 //     200
@@ -321,19 +338,19 @@ class DemoController extends Controller
             // // );
             // // get distint user in a month
             // //
-             for ($i = 0; $i < count($data1); $i++) {
-            //     $kt = 1;
-            //     for ($j = 0; $j < count($user_list); $j++) {
-            //         if ($data1[$i]['user_id'] == $user_list[$j]) {
-            //             $kt = 0;
-            //             break;
-            //         }
-            //     }
-            //     if ($kt == 1) {
-                     $user_list[] = $data1[$i]['id'];
-                     $user_id[] = $data1[$i]['name'];
-            //     }
-             }
+            for ($i = 0; $i < count($data1); $i++) {
+                //     $kt = 1;
+                //     for ($j = 0; $j < count($user_list); $j++) {
+                //         if ($data1[$i]['user_id'] == $user_list[$j]) {
+                //             $kt = 0;
+                //             break;
+                //         }
+                //     }
+                //     if ($kt == 1) {
+                $user_list[] = $data1[$i]['id'];
+                $user_id[] = $data1[$i]['name'];
+                //     }
+            }
 
 
             //main thing
@@ -362,17 +379,17 @@ class DemoController extends Controller
 
                     if ($row[$t] != '_') {
 
-                         $tmp_day = $t - 1;
-                       
+                        $tmp_day = $t - 1;
+
                         $permit = Absence_request::whereMonth('absence_date', '=', $m)
                             ->whereDay('absence_date', '=', $tmp_day)
                             ->where('user_id', $user_list[$i])
                             ->where('status', 'Approve')
                             ->get();
-                            // return response()->json(
-                            //     array('msg' => $user_list[$i]),
-                            //     200
-                            // );
+                        // return response()->json(
+                        //     array('msg' => $user_list[$i]),
+                        //     200
+                        // );
                         $tmp = '';
                         if (count($permit) != 0) {
                             $count_work++;
@@ -388,9 +405,9 @@ class DemoController extends Controller
                             if (count($data) != 0) {
                                 $check_in = date_create_from_format("Y-m-d H:i:s", $data[0]['time_in'])->format("H:i:s");
                                 $check_out = date_create_from_format("Y-m-d H:i:s", $data[0]['time_out'])->format("H:i:s");
-                                $kt1 = 0; 
+                                $kt1 = 0;
 
-                                $work=1;
+                                $work = 1;
                                 //dung gio lam
                                 if (date('08:35:00') >= $check_in && $check_out >= date('17:30:00')) {
                                     $kt1 = 2;
@@ -399,27 +416,27 @@ class DemoController extends Controller
                                 //check muon sang
                                 if (date('08:36:00') < $check_in && $check_in < date('09:46:00')) {
                                     $kt1 = 1;
-                                   $work-=0.25;
+                                    $work -= 0.25;
                                 }
                                 //nghi sang
                                 if (date('09:46:00') < $check_in && $check_in < date('14:46:00')) {
                                     $kt1 = 1;
-                                    $work-=0.5;
+                                    $work -= 0.5;
                                 }
                                 //nghi chieu
                                 if (date('14:46:00') < $check_in || $check_out < date('14:46:00')) {
                                     $kt1 = 1;
-                                    $work-=0.5;
+                                    $work -= 0.5;
                                 }
                                 //ve som chieu
                                 if (date('14:46:00') < $check_out && $check_out < date('17:29:00')) {
                                     $kt1 = 1;
-                                    $work-=0.25;
+                                    $work -= 0.25;
                                 }
                                 if ($kt1 == 1) {
                                     $tmp = 'A/N';
                                     $row[$t] = $tmp;
-                                    $count_work=$count_work+$work;
+                                    $count_work = $count_work + $work;
                                 }
                                 if ($kt1 == 2) {
                                     $tmp = 'Full';
@@ -433,11 +450,11 @@ class DemoController extends Controller
                         }
                     }
                 }
-              
+
                 $output .= '<tr id="abc">';
                 for ($t = 0; $t < count($row); $t++) {
                     $n = $t - 1;
-                    if ($t <= $request->upto_date) {
+                    if ($t <= $request->upto_date + 1) {
                         if ($row[$t] == 'A/N') {
                             $output .= '<td class="report_missing" onclick="detail(' . $user_list[$i] . ',' . $n . ',' . $m . ');"  data-toggle="modal" data-target="#myModal">' . $row[$t] . '</td>';
                         } else {
@@ -452,7 +469,7 @@ class DemoController extends Controller
                                 }
                             }
                         }
-                    }else{
+                    } else {
                         $output .= '<td  > </td>';
                     }
                 }
@@ -467,8 +484,23 @@ class DemoController extends Controller
                 $month1 = $request->month1;
                 $year1 = date("Y");
                 $output .= '
-                <h5>Fresher id :' . $user->id . '</h5>
-                <h5>Name :' . $user->name . '</h5>';
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Fresher ID</label>
+                            <p class="form-control">' . $user->id . '</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Fresher name</label>
+                            <p class="form-control">' . $user->name . '</p>
+                        </div>
+                    </div>
+                </div>
+            ';
                 $data1 = Timesheet::whereMonth('time_in', '=', $month1)
                     ->whereYear('time_in', '=', $year1)
                     ->whereDay('time_in', '=', $date1)
@@ -476,8 +508,23 @@ class DemoController extends Controller
                     ->first();
                 if (isset($data1)) {
                     $output .= '
-                <h5>Check in :' . $data1['time_in'] . '</h5>
-                <h5>Check out :' . $data1['time_out'] . '</h5>';
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Check in</label>
+                            <p class="form-control">' .  $data1['time_in'] . '</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Check out</label>
+                            <p class="form-control">' .  $data1['time_out'] . '</p>
+                        </div>
+                    </div>
+                </div>
+            ';
                 }
 
 
@@ -492,7 +539,15 @@ class DemoController extends Controller
                 if (count($permit) != 0) {
                     for ($k = 0; $k < count($permit); $k++) {
                         $output .= '
-                    <h5>Absence ' . $permit[$k]['type'] . ' : Approved</h5>';
+                        <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Abcense approved</label>
+                            <p class="form-control">' . $permit[$k]['type'] . '</p>
+                        </div>
+                    </div>
+                </div>
+                   ';
                     }
                 } else {
                     if (isset($data1['time_in'])) {
@@ -502,13 +557,28 @@ class DemoController extends Controller
 
                             $result = rtrim($result, ", ");
                             $output .= '
-                            <h5>No permission absense :
-                            ' . $result . '</h5>';
+                            <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Abcense no permission</label>
+                                    <p class="form-control">' .$result . '</p>
+                                </div>
+                            </div>
+                        </div>
+
+                            ';
                         }
                     } else {
                         $output .= '
-                        <h5>No permission absense :
-                         Full day absence</h5>';
+                        <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Abcense no permission</label>
+                                <p class="form-control">Full day absence</p>
+                            </div>
+                        </div>
+                    </div>
+';
                     }
                 }
             }

@@ -28,20 +28,21 @@
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <i class="now-ui-icons ui-1_zoom-bold"></i>
+                                <div class="drop" onclick="myFunctiondrop()" style="float:right;">
+                            <button class="dropbtn" style="border: none;">Filter</button>
+
+                        </div>
                             </div>
                         </div>
                     </div>
                     <div class="input-group no-border">
 
 
-                        <div class="drop" onclick="myFunctiondrop()" style="float:right;">
-                            <button class="dropbtn" style="border: none;">Filter</button>
-
-                        </div>
+                       
                     </div>
                     <div class="row" id="demodrop" style="display: none;padding-bottom: 2%;">
 
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Absence </label>
                                 <select name="type" id="type" onclick="preClick(3)" class="form-control">
@@ -49,15 +50,19 @@
                                     <option value="Morning">Morning</option>
                                     <option value="Afternoon">Afternoon</option>
                                     <option value="Full">Full</option>
+                                    <option value="Morning late">Morning late</option>
+                                    <option value="Leave early">Late early</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Absence </label>
                                 <select name="order" id="order" onclick="preClick(3)" class="form-control">
-                                    <option value="desc">New to old</option>
-                                    <option value="asc">Old to new</option>
+                                <option value="">All</option>
+                                <option value="Pending">Pending</option>
+                                    <option value="Approve">Approved</option>
+                                    <option value="Reject">Reject</option>
                                 </select>
                             </div>
                         </div>
@@ -126,7 +131,7 @@
             }
 
 
-            document.getElementById("month_now").innerHTML = tableMonth + " / " + currentYear;
+            document.getElementById("month_now").innerHTML = 'REQUEST :'+tableMonth + " / " + currentYear;
             $('#databody').children('#abc').remove();
 
             searchFresher();
@@ -145,8 +150,12 @@
         }
 
 
-
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#request_nav').addClass('active');
+        }
         $(document).ready(function() {
+            set_nav();
             preClick(3);
         });
         //ajax

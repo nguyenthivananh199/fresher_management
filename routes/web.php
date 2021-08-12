@@ -7,6 +7,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TimesheetController;
+use App\Http\Controllers\FresherController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\RequestController;
 // use App\Http\Controllers\Auth\LoginController;
@@ -26,6 +27,8 @@ use Laravel\Socialite\Facades\Socialite;
 */
 
 Route::group(['middleware' => ['role:fresher']], function () {
+  ///home
+ 
   ////timesheet
   Route::get('/timesheet', function () {
     return view('fresher.timesheet');
@@ -80,7 +83,7 @@ Route::group(['middleware' => ['permission:Fresher management']], function () {
   Route::get("/fresher_data", [DemoController::class, 'fresher_management_data']);
   Route::get("/detail/{id}", [DemoController::class, 'view_detail'])->name('fresher_detail');
   //add fresher
-  Route::get("/add_fresher", [DemoController::class, 'add_fresher']);
+  Route::post("/add_fresher", [DemoController::class, 'add_fresher']);
   Route::post("/detail/update", [DemoController::class, 'update_fresher']);
   Route::post("/detail/update_ava", [DemoController::class, 'update_ava']);
 });
@@ -94,7 +97,7 @@ Route::group(['middleware' => ['permission:super']], function () {
   Route::get("/admin_search", [AdminController::class, 'display_list_admin']);
   Route::get("/detail_admin/{id}", [AdminController::class, 'view_detail'])->name('admin_detail');
   Route::post("/detail_admin/update_admin", [AdminController::class, 'update_admin']);
-  
+  Route::post("/detail_admin/update_ava", [AdminController::class, 'update_ava']);
   //////
 });
 /////ADMIN LOGIN
@@ -106,14 +109,14 @@ Route::post("/login_admin", [LoginController::class, 'login_admin']);
 ///////////
 /////super admin manage admin
 
-
-//report route
-
-//update fresher
-
-//view fresher detail
-
-// 
+//PROFILE FRESHER
+Route::get("/profile", [FresherController::class, 'view_profile']);
+Route::post("/reset_pass", [FresherController::class, 'reset_pass']);
+Route::post("update_ava", [FresherController::class, 'update_ava']);
+/////
+///PROFILE_ADMIN
+Route::get("/profile_admin", [AdminController::class, 'view_profile']);
+///
 Route::get('/please', function () {
   return view('admin.fresher_detail');
 });
@@ -130,7 +133,7 @@ Route::get("/auth/callback", [LoginController::class, 'logindemo']);
 
 Route::get('/logout', function () {
   Auth::logout();
-  return 'hello';
+  return view('auth.login');
 });
 
 //fresher request
@@ -140,7 +143,7 @@ Route::get('/logout', function () {
 //admin request
 
 ///////
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
 Auth::routes();
 //Route::group(['middleware' => ['permission:report_manage']], function () {
 //
@@ -156,4 +159,9 @@ Route::get("/check_exist_role", [RoleController::class, 'check_exist_role']);
 Route::get("/display_admin_list", [RoleController::class, 'display_list_fresher']);
 Route::get("/detail_role/{id}", [RoleController::class, 'view_detail'])->name('role_detail');
 Route::post("/detail_role/update_role", [RoleController::class, 'update_role']);
+
 ////////////
+
+Route::get('/home', function () {
+  return view('fresher.home');
+})->name('home');

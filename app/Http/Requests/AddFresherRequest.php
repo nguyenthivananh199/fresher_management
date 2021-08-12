@@ -24,16 +24,16 @@ class AddFresherRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|unique:users',
-            'name' => 'required|string|max:50',
+            'email' => 'required|email',
+            'name' => 'required|string|max:70',
+            'part' => 'required|string|max:30',
+            'phone' => 'required|string|max:20',
         ];
     }
     public function messages()
     {
         return [
-            'email.unique' => 'Email is required!',
-            'email.required' => 'Email is required!',
-            'name.required' => 'Name is required!',
+          
         ];
     }
 }

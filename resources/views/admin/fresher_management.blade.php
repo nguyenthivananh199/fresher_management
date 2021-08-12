@@ -8,7 +8,37 @@
         -webkit-appearance: none;
         margin: 0;
     }
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        opacity: 0.7;
+    }
 </style>
+<div class="row">
+
+<div id="snackbar"> @if($errors->any())
+@foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+
+                        @endforeach
+    @endif</div>
+</div>
+
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -21,13 +51,14 @@
                         <h5 class="title">Add Fresher</h5>
                     </div>
                     <div class="card-body">
-                        <form action="add_fresher">
+                        <form action="add_fresher" method="POST" enctype="multipart/form-data">
                             @csrf
-                           
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">Fullname</label>
+
                                         <input type="text" class="form-control" onkeyup="setEmail();" name="name" id="name" placeholder="name">
                                     </div>
                                 </div>
@@ -39,7 +70,8 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">Email address</label>
-                                        <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+                                        <input type="email" onkeyup="mai_check_existed()" class="form-control" name="email" id="email" oncplaceholder="Email">
+                                        <div id="check"></div>
                                     </div>
                                 </div>
                             </div>
@@ -49,6 +81,15 @@
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">Date of birth</label>
                                         <input type="date" class="form-control" id="dob" name="dob" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div >
+                                        <label for="exampleInputEmail1">Picture</label>
+                                        <input class="form-control" type="file" name="pic" id="pic" required>
                                     </div>
                                 </div>
                             </div>
@@ -72,7 +113,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" name="submit"> Submit</button>
+                            <button type="submit" name="submit" id="submit" class="submit-btn  btn-info btn"> Submit</button>
                         </form>
                     </div>
                 </div>
@@ -90,18 +131,17 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                {{$mess}}
-                    {{$errors}}
-                    @if(isset($add_success))
-                    <p>Add fresher successfully</p>
-                    @endif
+                    <!-- {{$mess}} -->
+
                     <div class="row">
+                    <div class="col-10"></div>
 
-
-                        <button class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add fresher</button>
+                        <button  data-toggle="modal" data-target="#myModal" class="col btn btn-info ">Add fresher</button>
                     </div>
                     <div>
-
+                    <div style="text-align: center;">
+                    <h3>FRESHER MANAGEMENT</h3>
+                    </div>
                     </div>
 
                     <div class="input-group no-border">
@@ -109,12 +149,13 @@
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <i class="now-ui-icons ui-1_zoom-bold"></i>
-                            </div>
-                        </div>
-                        <div class="drop" onclick="myFunctiondrop()" style="float:right;">
+                                <div class="drop" onclick="myFunctiondrop()" style="float:right;">
                             <button class="dropbtn" style="border: none;">Filter</button>
 
                         </div>
+                            </div>
+                        </div>
+                       
                     </div>
                     <div class="row" id="demodrop" style="display: none;padding-bottom: 2%;">
 
@@ -163,7 +204,10 @@
     </div>
     <script>
         var selected_ = [];
-
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#fresher_nav').addClass('active');
+        }
         function class_filter() {
             var selected = [];
             $('#checkboxes input:checked').each(function() {
@@ -205,14 +249,55 @@
                 mail = mail + myArr[i][0];
             }
             mail = mail + "@vmodev.com";
-              mail = removeAccents(mail)
-            document.getElementById("email").value = mail;
+            mail = removeAccents(mail)
+            //  document.getElementById("check").innerHTML = "Suggession mail:"+mail;
         }
 
         function removeAccents(str) {
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         }
+
+        function mai_check_existed() {
+            var prev_mail = "";
+            var txt = document.getElementById("email").value;
+            console.log("value :" + txt);
+            $.ajax({
+                url: "/email_ajax",
+                // method: "GET",
+                type: "GET",
+                data: {
+                    search: txt,
+                    prev_mail: prev_mail,
+                },
+                dataType: "json",
+                success: function(data) {
+                    // $('#result').html(data.msg);
+                    console.log(data.msg);
+
+
+                    if (data.msg == 0) {
+                        document.getElementById("check").innerHTML = "Email available !";
+                        document.getElementById("submit").disabled = false;
+                    } else {
+                        document.getElementById("check").innerHTML = "Email unavailable !";
+                        document.getElementById("submit").disabled = true;
+                    }
+                    // $("#data").append(data.msg);
+                    // document.getElementById('#result').innerHTML = data;
+                    // $('#result').innerHTML = data
+                }
+            });
+        }
         $(document).ready(function() {
+            set_nav();
+            <?php if ($errors->any()) { ?>
+                    var x = document.getElementById("snackbar");
+                    x.className = "show";
+                    setTimeout(function() {
+                        x.className = x.className.replace("show", "");
+                    }, 3000);
+
+                <?php } ?>
             searchFresher();
         });
         //ajax
@@ -222,7 +307,7 @@
             for (var i = 0; i < 3; i++) {
                 if (typeof selected_[i] == 'undefined') {
                     // the variable is defined
-                    selected_[i]='';
+                    selected_[i] = '';
 
                 }
             }

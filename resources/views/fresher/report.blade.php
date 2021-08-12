@@ -4,15 +4,30 @@
 
 
 <link href="/demo/fresher.css" rel="stylesheet" />
+<!-- Contact section -->
+<section id="home" style="width: 100%; height:300px ; background-repeat: no-repeat;background-image: url('/img/bghome.jpg'); background-size: auto;">
+    <div class="overlay" style="height:305px ;"></div>
+    <div class="container">
+        <div class="row" style="margin-right: 10%;margin-left: 10%;">
+
+            <div class="col-md-offset-1 col-sm-12 wow fadeInUp" data-wow-delay="0.3s">
+                <h1 class="wow fadeInUp" data-wow-delay="0.6s">report</h1>
+                <p class="wow fadeInUp" data-wow-delay="0.9s">Snapshot website template is available for free download. Anyone can modify and use it for any site. Please tell your friends about <a rel="nofollow" href="http://www.templatemo.com">templatemo</a>. Thank you.</p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
 
 <!-- Contact section -->
 <section id="about">
     <div class="container">
-        <div class="row">
+        <div class="rowa">
 
-            <div class="col-md-10 " data-wow-delay="0.2s" style="width:99%;">
-                <h1>REPORT</h1>
-                <p>Quisque tempor bibendum dolor at volutpat. Suspendisse venenatis quam sed libero euismod feugiat. In cursus nisi vitae lectus facilisis mollis. Nullam scelerisque, quam nec iaculis vulputate.</p>
+            <div data-wow-delay="0.2s" style="width:99%;">
+
                 <div class="about-thumb">
 
 
@@ -220,52 +235,64 @@
                 </div>
 
                 <!-- -------------------- -->
+                <div class="row" style="margin-left: 80%;height: 50px;;">
 
-                <button data-toggle="modal" id="addBtn" data-target="#add_report">Add Today Report</button>
-                <button data-toggle="modal" id="editBtn" data-target="#update_report">Edit Today Report</button>
-                <div id="calender-title" class="disable-select flex row center-v around">
-                    <div id="left" class="flex row center-vh"><span>
+                    <button data-toggle="modal" id="addBtn" data-target="#add_report" class="btn_func btn">Add Report</button>
+                    <button data-toggle="modal" id="editBtn" data-target="#update_report" class="btn_func btn">Edit Report</button>
+                </div>
+
+                <div id="calender-title" class="disable-select flex rowa center-v around">
+                    <div id="left" class="flex rowa center-vh"><span>
                             < </span>
                     </div>
-                    <p class="flex row center-vh"></p>
-                    <div id="right" class="flex row center-vh"><span>></span></div>
+                    <p class="flex rowa center-vh"></p>
+                    <div id="right" class="flex rowa center-vh"><span>></span></div>
+                </div>
+                <div class="row" style="width: 70%;height: 50px; margin-left: 15%;margin-top: 5%;margin-bottom: 5%;">
+                    <div class="col-1" style="background-color: #f86f06;"></div>
+                    <div class="col-3">Submited late</div>
+                    <div class="col-1" style="background-color: rgb(49, 47, 47);"></div>
+                    <div class="col-3">No information</div>
+                    <div class="col-1" style="background-color: rgb(34, 22, 73)"></div>
+                    <div class="col-3">Submited in time</div>
                 </div>
                 <div id="calender-wrapper">
+                    <div id="calender-wrapper">
 
 
-                    <div id="days" class="flex row center-vh colorRed disable-select">
-                        <p>MON</p>
-                        <p>TUE</p>
-                        <p>WEDS</p>
-                        <p>THURS</p>
-                        <p>FRI</p>
-                        <p>SAT</p>
-                        <p>SUN</p>
+                        <div id="days" class="flex rowa center-vh colorRed disable-select">
+                            <p>MON</p>
+                            <p>TUE</p>
+                            <p>WEDS</p>
+                            <p>THURS</p>
+                            <p>FRI</p>
+                            <p>SAT</p>
+                            <p>SUN</p>
+                        </div>
+                        <div id="calender-content" class="flex rowa wrap disable-select">
+                        </div>
+
                     </div>
-                    <div id="calender-content" class="flex row wrap disable-select">
-                    </div>
+
+
+
 
                 </div>
-
-
-
-
             </div>
+
+
         </div>
 
 
-    </div>
 
 
-
-
-    <!-- end team carousel -->
+        <!-- end team carousel -->
 
     </div>
     </div>
 
 
-    </body>
+   <div style="margin-top: 1100px;"></div>
     <script>
         var currentMonth = new Date().getMonth();
         var currentMonth1 = new Date().getMonth();
@@ -311,6 +338,7 @@
         }
 
         function add_class(arr) {
+            console.log(arr);
             for (var i = 1; i < arr.length; i++) {
                 var x = "#" + i;
 
@@ -399,17 +427,18 @@
 
 
         $(function() {
+            set_nav();
             var check_today_report = '<?php echo $check_report; ?>';
             var m = currentMonth + 1;
             var today = new Date();
-            var i=today.getDate();
+            var i = today.getDate();
             var tmp1 = currentYear + '-' + m + '-' + i;
-console.log(tmp1);
+            console.log(tmp1);
             var d = new Date(tmp1);
             if (d.getDay() == '0' || d.getDay() == '6') {
                 document.getElementById("addBtn").disabled = true;
                 document.getElementById("editBtn").disabled = true;
-                
+
             } else {
                 if (check_today_report == "true") {
                     //disable add 
@@ -426,13 +455,15 @@ console.log(tmp1);
             $("#date").append(new Date);
             search();
         });
-
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#report1').addClass('active');
+        }
         $("#left").on("click", function() {
-            if (currentMonth > 0)
+            if (currentMonth > 0 )
                 currentMonth -= 1;
             else {
-                currentMonth = 11;
-                currentYear -= 1;
+               
             }
             displayCalender();
             search();
@@ -441,11 +472,11 @@ console.log(tmp1);
             if (currentMonth < 11)
                 currentMonth += 1;
             else {
-                currentMonth = 0;
-                currentYear += 1;
+              
             }
             displayCalender();
             search();
         });
     </script>
+    
     @endsection

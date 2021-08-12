@@ -1,5 +1,43 @@
 @extends('master')
 @section("content")
+<div class="modal fade" id="instruction" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div style="text-align: center;margin-top:4%;" class="">
+                <h4>Information</h4>
+                <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+            </div>
+            <div class="modal-body" >
+                <table style="width:60%;text-align: left;margin-left: 25%;margin-right: 15%;">
+
+                    <tr>
+                   
+                    <tr>
+                    <td><div style="width: 50px;height: 50px;background-color: yellow;text-align: center;padding-top:15px;">I/T</div></td>
+                        <td> <p>In time</p> </td>
+                       
+
+                    </tr>
+
+                    <td><div style="width: 50px;height: 50px;background-color: yellow;text-align: center;padding-top:15px;">O/T</div></td>
+                        <td> <p>Out time</p> </td>
+                       
+
+                    </tr>
+                    <td><div style="width: 50px;height: 50px;background-color: yellow;text-align: center;padding-top:15px;">N/A</div></td>
+                        <td> <p>No information</p> </td>
+                       
+
+                    </tr>
+                    
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div> 
 <!-- modal box -->
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
@@ -26,7 +64,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-
+                <i data-toggle="modal" data-target="#instruction" style="float: right;" class="fas fa-info-circle"></i>
                     <div class="row">
 
 
@@ -77,14 +115,19 @@
     </div>
     <script>
         $(document).ready(function() {
+            set_nav();
             preClick(2);
+            
         });
 
       
         //const myFather = new Person("John", "Doe", 50, "blue");
         ////people.push(myFather);
 
-       
+        function set_nav() {
+            $(".nav1 li").removeClass("active");
+            $('#report_nav').addClass('active');
+        }
 
         var currentMonth = new Date().getMonth();
         var currentYear = new Date().getFullYear();
@@ -94,10 +137,10 @@
         var idnum = 0;
 
         function preClick(kt) {
-            if (kt == 0) {
+            if (kt == 0 && tableMonth>1) {
                 tableMonth = tableMonth - 1;
             } else {
-                if (kt == 1) {
+                if (kt == 1 && tableMonth<12) {
                     tableMonth = tableMonth + 1;
                 }
 
@@ -161,7 +204,7 @@
                 dataType: "json",
                 success: function(data) {
                     //$('#result').html(data.msg);
-                    // console.log(data.msg);
+                     console.log(data.msg);
                     $("#data").append(data.msg);
                     // document.getElementById('#result').innerHTML = data;
                     // $('#result').innerHTML = data

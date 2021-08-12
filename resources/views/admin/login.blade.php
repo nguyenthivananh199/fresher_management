@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<link href="/demo/fresher.css" rel="stylesheet" />
+
+
 <div class="container">
+
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -60,7 +64,12 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Login') }}
                                 </button>
+                                <h1>dsfds</h1>
+                                <div id="snackbar">
 
+ @if($errors->any())
+    {{$errors->first()}}
+    @endif</div>
                                 <!-- @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="{{ route('password.request') }}">
                                         {{ __('Forgot Your Password?') }}
@@ -73,5 +82,20 @@
             </div>
         </div>
     </div>
+    
 </div>
+<script>
+
+$(document).ready(function() {
+               
+                <?php if ($errors->any()) { ?>
+                    var x = document.getElementById("snackbar");
+                    x.className = "show";
+                    setTimeout(function() {
+                        x.className = x.className.replace("show", "");
+                    }, 3000);
+
+                <?php } ?>
+            });
+</script>
 @endsection

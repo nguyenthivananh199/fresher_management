@@ -20,31 +20,30 @@ class LoginController extends Controller
             $role = $user->getRoleNames();
             
             if($role[0]=='fresher'){
-                return 'fresher dashboard';
-
+                return redirect()->route('home');
             }else{
                 return redirect()->route('dashboard');
             }
         }else{
-            return redirect()->back();
+            return redirect()->route('login')->withErrors(['Fail, account undefined']);
         }
     }
     function logindemo()
     {
         $user = Socialite::driver('google')->user();
         // Auth::login($user);
-        $user_exist = User::where('email', $user->email)->first();
+        $user_exist = User::where('email', $user->email)->where('status','Active')->first();
         if(isset($user_exist->id)){
             Auth::login($user_exist);
             $role = $user_exist->getRoleNames();
             if($role[0]=='fresher'){
-                return 'fresher dashboard';
-
+                
+                return redirect()->route('home');
             }else{
                 return redirect()->route('dashboard');
             }
         }else{
-            return redirect()->back();
+            return redirect()->route('login')->withErrors(['Account undefined']);
         }
     }
 }

@@ -20,44 +20,46 @@ https://vegas.jaysalvat.com/
 Caption Hover Effects
 http://tympanus.net/codrops/2013/06/18/caption-hover-effects/
 -->
-    <link rel="stylesheet" href="fresher/css/bootstrap.min.css">
-    <link rel="stylesheet" href="fresher/css/animate.min.css">
+
+    <!-- <link rel="stylesheet" href="fresher/css/animate.min.css">
     <link rel="stylesheet" href="fresher/css/font-awesome.min.css">
     <link rel="stylesheet" href="fresher/css/component.css">
 
     <link rel="stylesheet" href="fresher/css/owl.theme.css">
     <link rel="stylesheet" href="fresher/css/owl.carousel.css">
-    <link rel="stylesheet" href="fresher/css/vegas.min.css">
+    <link rel="stylesheet" href="fresher/css/vegas.min.css"> -->
     <link rel="stylesheet" href="fresher/css/style.css">
 
-  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- <link href="/demo/fresher.css" rel="stylesheet" /> -->
     <!-- Google web font  -->
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,300' rel='stylesheet' type='text/css'>
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 </head>
 
-<body id="top" data-spy="scroll" data-offset="50" data-target=".navbar-collapse">
+<body>
+
+    <div class="wrapper" style="    position: relative;
+    top: 0;
+    height: 100vh;">
+        <!-- Preloader section -->
+
+        <div class="preloader">
+            <div class="sk-spinner sk-spinner-pulse"></div>
+        </div>
 
 
-    <!-- Preloader section -->
+        <!-- Navigation section  -->
 
-    <div class="preloader">
-        <div class="sk-spinner sk-spinner-pulse"></div>
-    </div>
+        {{View:: make('fresher.layout.navbar')}}
 
 
-    <!-- Navigation section  -->
+        <!-- Home section -->
 
-    {{View:: make('fresher.layout.navbar')}}
-
-
-    <!-- Home section -->
-
-    <!-- <section id="home">
+        <!-- <section id="home">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -78,23 +80,20 @@ http://tympanus.net/codrops/2013/06/18/caption-hover-effects/
 
 
 
-  
-@yield('content');
-    <!-- Footer section -->
 
-    {{View:: make('fresher.layout.footer')}}
+        @yield('content')
+        <!-- Footer section -->
 
-    <!-- Back top -->
+        {{View:: make('fresher.layout.footer')}}
+
+    </div> <!-- Back top -->
     <a href="#" class="go-top"><i class="fa fa-angle-up"></i></a>
 
     <!-- Javascript  -->
     <script src="fresher/js/jquery.js"></script>
-    <script src="fresher/js/bootstrap.min.js"></script>
-    <script src="fresher/js/vegas.min.js"></script>
-    <script src="fresher/js/modernizr.custom.js"></script>
-    <script src="fresher/js/toucheffects.js"></script>
-    <script src="fresher/js/owl.carousel.min.js"></script>
-    <script src="fresher/js/smoothscroll.js"></script>
+    <!-- <script src="fresher/js/bootstrap.min.js"></script> -->
+
+
 
     <script src="fresher/js/custom.js"></script>
 

@@ -13,6 +13,8 @@ class RoleController extends Controller
     //
     function update_role(Request $request){
         $role=Role::find($request->id);
+        $role->name=$request->name;
+        $role->save();
         $role->permissions()->detach();
         if(isset($request->Fresher_management)){
             $role->givePermissionTo('Fresher management');
@@ -22,7 +24,7 @@ class RoleController extends Controller
         if(isset($request->Report_management)){
             $role->givePermissionTo('Report management');
         }
-        return redirect()->back();
+        return redirect()->back()->withErrors(['Update role successfully']);
     }
     function view_role_management(){
         $permission=Permission::all();
@@ -40,7 +42,7 @@ class RoleController extends Controller
         if(isset($request->Report_management)){
             $role->givePermissionTo('Report management');
         }
-        return redirect()->back();
+        return redirect()->back()->withErrors(['Add role successfully']);
 
     }
     function check_exist_role(Request $request){
@@ -74,7 +76,11 @@ class RoleController extends Controller
             $class3 = $request->class3;
             if($request->deleteid!=-1){
                 $deleteid = $request->deleteid;
-            
+                $users_role =User::whereHas("roles", function($q)use($deleteid){ $q->where("id", $deleteid); })->get();
+                for($x=0;$x<count($users_role);$x++){
+                    $users_role[$x]->roles()->detach();
+                    $users_role[$x]->assignRole('admin_default');
+                }
                 $role = Role::findOrFail($deleteid); 
                 
                 $role->delete();

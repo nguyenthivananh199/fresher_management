@@ -1,23 +1,55 @@
-body {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-	font-family:  "Baloo";
-}
-.row{
+
+.rowa{
 	margin: 0px !important;
 }
 .report_in_time{
-	background-color: rgb(101, 133, 185);
+	background-color: rgb(34, 22, 73);
 
 }
+.btn{
+	background-color: #0d0e14
+	;
+	color: white;
+	font-size: 12pt;
+	margin-left: 0px;
+	margin-right: 10px;
+	margin-bottom: 50px;
+	margin-top: 0px;
+  }
+  .submit-btn{
+	margin-top: 5%;
+   float: right;
+  
+  }
+.btn_func{
+	float: right;
+}
+#snackbar {
+	visibility: hidden;
+	min-width: 250px;
+	margin-left: -125px;
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+	border-radius: 2px;
+	padding: 16px;
+	position: fixed;
+	z-index: 1;
+	left: 50%;
+	bottom: 30px;
+	font-size: 17px;
+}
+
+#snackbar.show {
+	visibility: visible;
+	opacity: 0.7;
+}
 .report_out_time{
-	background-color: yellow;
+	background-color: #f86f06;
 	
 }
 .report_missing{
-	background-color: rgb(255, 112, 56);
+	background-color: rgb(49, 47, 47);
 	
 }
 
@@ -70,7 +102,7 @@ body {
 }
 .colorRed {
 	color: white;
-	background-color:#262333 ;
+	background-color:#14043c ;
 }
 .bgColorRed {
 	background-color: #262333;
@@ -146,6 +178,7 @@ body {
 
 
 .month {
+	background-color: white;
 	width: 157.14px;
 	height: 157.14px;
 	transition: .4s;
@@ -157,7 +190,9 @@ body {
 	text-align: center;	
 	font-size: 15pt;
 }
-
+#days{
+	width: 1100px;
+}
 .month-selector {
 	width: 100%;
 	height: 100%;
@@ -180,6 +215,6 @@ body {
 	height: 169px;
 	width: 169px;
 	box-shadow: 0px 0px 13px 4px rgba(0, 0, 0, 0.14);
-	background: #FF6B0B;
+	background: #9c9c9c;
 	border: 1px solid #000000;
 }

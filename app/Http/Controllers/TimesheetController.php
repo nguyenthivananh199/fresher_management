@@ -121,16 +121,54 @@ class TimesheetController extends Controller
                 ->whereDay('time_in', '=',$day)
                 ->where('user_id',$user->id)
                 ->first();
+
+                $output .= '
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Fresher name</label>
+                        <p class="form-control">' .$user->name. '</p>
+                    </div>
+                </div>
+            </div>';
                 if(empty($data1)){
                     $output .= '
-                    <h5>Name :' . $user->name . '</h5>
-                    <h5>Time in : no information </h5>
-                    <h5>Time out : no information </h5>';
+                   
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Check in</label>
+                            <p class="form-control">No information</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Check out</label>
+                        <p class="form-control">No information</p>
+                    </div>
+                </div>
+            </div>';
                 }else{
                     $output .= '
-                    <h5>Name :' . $user->name . '</h5>
-                    <h5>Check in :' . $data1->time_in . '</h5>
-                    <h5>Check out:' . $data1->time_out. '</h5>
+                    <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Check in</label>
+                            <p class="form-control">' . $data1->time_in . '</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Check out</label>
+                        <p class="form-control">' . $data1->time_out . '</p>
+                    </div>
+                </div>
+            </div>
+                    
                      ';
                 }
                    

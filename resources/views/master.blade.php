@@ -26,16 +26,16 @@
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="/demo/demo.css" rel="stylesheet" />
 </head>
-{{View:: make('sidebar')}}
+{{View:: make('admin.layouts.sidebar')}}
 <body >
     <div class="wrapper ">
     
         <div class="main-panel" id="main-panel">
             <!-- Navbar -->
-            {{View:: make('navbar')}}
+            {{View:: make('admin.layouts.navbar')}}
             <!-- End Navbar -->
             @yield('content');
-            {{View:: make('footer')}}
+            {{View:: make('admin.layouts.footer')}}
         </div>
     </div>
     <!--   Core JS Files   -->
